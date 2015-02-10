@@ -56,6 +56,7 @@ sliderDirective = ($timeout) ->
     ngModel:      '=?'
     ngModelLow:   '=?'
     ngModelHigh:  '=?'
+    onStopSlide:  '&'
   template: '''
     <div class="bar"><div class="selection"></div></div>
     <div class="handle low"></div><div class="handle high"></div>
@@ -84,6 +85,9 @@ sliderDirective = ($timeout) ->
       unless range
         upper.remove() for upper in [maxPtr, highBub]
         selection.remove() unless attributes.highlight
+
+      scope[low] = parseFloat(scope.floor) unless scope[low]
+      scope[high] = parseFloat(scope.ceiling) unless scope[high]
 
       scope.local = {}
       scope.local[low] = scope[low]
@@ -159,6 +163,8 @@ sliderDirective = ($timeout) ->
             if scope.dragstop
               scope[high] = scope.local[high]
               scope[low] = scope.local[low]
+            if attributes.onStopSlide
+              scope.onStopSlide()(scope.local[low], scope.local[high])
             currentRef = ref
             scope.$apply()
           onMove = (event) ->
